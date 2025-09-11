@@ -10,3 +10,38 @@
   -ms-overflow-style: none;  /* IE/Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+
+/* ---------- hide scrollbar (utility) ---------- */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---------- slim / thin scrollbar (utility) ---------- */
+.scrollbar-thin {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.32) transparent;
+}
+
+/* WebKit browsers (Chrome, Edge, Safari) */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.32);
+  border-radius: 9999px;
+  border: 2px solid transparent;        /* creates padding so thumb doesn't touch edge */
+  background-clip: padding-box;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0,0,0,0.6);
+}
+
+/* optional: make thin scrollbar more visible when hovering the container */
+.scrollbar-thin:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.45);
+}

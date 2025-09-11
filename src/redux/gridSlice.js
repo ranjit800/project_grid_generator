@@ -1,32 +1,40 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  gridSize: { rows: 20, cols: 20 },
-  elements: [], // placed elements
+  gridSize: { rows: 5, cols: 5 },
+  elements: [],
 };
 
 const gridSlice = createSlice({
-  name: 'grid',
+  name: "grid",
   initialState,
   reducers: {
-    setGridSize: (state, action) => {
-      state.gridSize = action.payload;
-    },
-    addElement: (state, action) => {
-      state.elements.push(action.payload);
-    },
-    updateElement: (state, action) => {
-      const { id, updates } = action.payload;
-      const index = state.elements.findIndex(el => el.id === id);
-      if (index !== -1) {
-        state.elements[index] = { ...state.elements[index], ...updates };
+    placeElement: (state, action) => {
+      const { position, element } = action.payload;
+      const existing = state.elements.find(
+        (el) =>
+          el.position[0] === position[0] &&
+          el.position[1] === position[1]
+      );
+
+      if (existing) {
+        existing.items.push(element);
+      } else {
+        state.elements.push({ position, items: [element] });
       }
     },
-    removeElement: (state, action) => {
-      state.elements = state.elements.filter(el => el.id !== action.payload);
+
+    // ✅ update gridSize from JSON editor
+    setGridSize: (state, action) => {
+      state.gridSize = action.payload; // { rows, cols }
+    },
+
+    // ✅ update elements from JSON editor
+    setElements: (state, action) => {
+      state.elements = action.payload; // array of elements
     },
   },
 });
 
-export const { setGridSize, addElement, updateElement, removeElement } = gridSlice.actions;
+export const { placeElement, setGridSize, setElements } = gridSlice.actions;
 export default gridSlice.reducer;
