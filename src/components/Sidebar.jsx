@@ -4,13 +4,13 @@ import { TreePine, Trees, Flower2, Leaf, Sofa, Camera, Apple } from "lucide-reac
 
 // Map of icons (safe to use only in UI, not in Redux state)
 const iconMap = {
-  tree: <TreePine size={22} />,
-  oak: <Trees size={22} />,
-  plant: <Flower2 size={22} />,
-  fruit: <Apple size={22} />,
-  groundCover: <Leaf size={22} />,
-  furniture: <Sofa size={22} />,
-  camera: <Camera size={22} />,
+  tree: <TreePine size={30} />,
+  oak: <Trees size={30} />,
+  plant: <Flower2 size={30} />,
+  fruit: <Apple size={30} />,
+  groundCover: <Leaf size={30} />,
+  furniture: <Sofa size={30} />,
+  camera: <Camera size={30} />,
 };
 
 // Library (use iconKey instead of actual JSX element)
@@ -65,7 +65,7 @@ function Sidebar() {
                   console.log("Selected:", item);
                   dispatch(setSelectedElement(item));
                 }}
-                className={`flex-shrink-0 w-20 h-20 flex flex-col items-center justify-center border rounded-lg bg-white p-2
+                className={`flex-shrink-0 w-20 h-28 flex flex-col items-center justify-center border rounded-lg bg-white p-2
                   ${selectedElement?.id === item.id ? "border-green-600 ring-1 ring-green-400" : "hover:bg-green-50"}`}
               >
                 {iconMap[item.iconKey]}
