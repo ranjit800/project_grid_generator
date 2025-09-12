@@ -168,10 +168,22 @@
 
 
 // src/components/Grid.jsx
-import React, { useState, useRef, useEffect } from "react";
+import  { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { placeElement } from "../redux/gridSlice";
 import { setPreviewCell, clearPreviewCell } from "../redux/uiSlice";
+import { TreePine, Trees, Flower2, Leaf, Sofa, Camera, Apple } from "lucide-react";
+
+// Map of icons (safe to use only in UI, not in Redux state)
+const iconMap = {
+  tree: <TreePine size={20} />,
+  oak: <Trees size={20} />,
+  plant: <Flower2 size={20} />,
+  fruit: <Apple size={20} />,
+  groundCover: <Leaf size={20} />,
+  furniture: <Sofa size={20} />,
+  camera: <Camera size={20} />,
+};
 
 export default function Grid() {
   const dispatch = useDispatch();
@@ -380,9 +392,14 @@ export default function Grid() {
               {/* show last placed non-ground item and +N badge */}
               {nonGroundItems.length > 0 && (
                 <>
-                  <div className="text-[10px] text-white text-center px-1 truncate">
-                    {nonGroundItems[nonGroundItems.length - 1].name}
-                  </div>
+                  <div className="flex items-center justify-center">
+  {iconMap[nonGroundItems[nonGroundItems.length - 1].type] || (
+    <span className="text-[9px] text-white">
+      {nonGroundItems[nonGroundItems.length - 1].name}
+    </span>
+  )}
+</div>
+
                   {nonGroundItems.length > 1 && (
                     <span className="absolute bottom-1 right-1 text-[9px] bg-white text-black border px-1 rounded shadow-sm">
                       +{nonGroundItems.length - 1}
