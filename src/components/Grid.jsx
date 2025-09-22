@@ -1,174 +1,6 @@
-// import React from "react";
-// import { useSelector, useDispatch } from "react-redux";
-// import { placeElement } from "../redux/gridSlice";
-// import { setPreviewCell, clearPreviewCell } from "../redux/uiSlice";
-
-// export default function Grid() {
-//   const dispatch = useDispatch();
-//   const { gridSize, elements } = useSelector((s) => s.grid);
-//   const { selectedElement, activeTool, previewCell, zoom } = useSelector(
-//     (s) => s.ui
-//   );
-
-//   const rows = gridSize?.rows || 5;
-//   const cols = gridSize?.cols || 5;
-
-//   const baseCellSize = 50;
-//   const cellSize = baseCellSize * (zoom || 1);
-
-//   const getOccupyingItems = (r, c) => {
-//     const occupying = [];
-//     for (const entry of elements) {
-//       const [pr, pc] = entry.position;
-//       for (const item of entry.items) {
-//         const [h = 1, w = 1] = item.size || [1, 1];
-//         if (r >= pr && r < pr + h && c >= pc && c < pc + w) {
-//           occupying.push(item);
-//         }
-//       }
-//     }
-//     return occupying;
-//   };
-
-//   const isPreviewCell = (r, c) => {
-//     if (!previewCell || !selectedElement) return false;
-
-//     if (activeTool === "mouse" && selectedElement.type !== "groundCover") {
-//       const [pr, pc] = previewCell;
-//       const [h = 1, w = 1] = selectedElement.size || [1, 1];
-//       return r >= pr && r < pr + h && c >= pc && c < pc + w;
-//     }
-
-//     if (activeTool === "ground" && selectedElement.type === "groundCover") {
-//       const [pr, pc] = previewCell;
-//       return r === pr && c === pc;
-//     }
-
-//     return false;
-//   };
-
-//   const previewValid = () => {
-//     if (!previewCell || !selectedElement) return false;
-
-//     if (activeTool === "mouse" && selectedElement.type !== "groundCover") {
-//       const [pr, pc] = previewCell;
-//       const [h, w] = selectedElement.size || [1, 1];
-//       if (pr + h > rows || pc + w > cols) return false;
-//       return true;
-//     }
-
-//     if (activeTool === "ground" && selectedElement.type === "groundCover") {
-//       const [pr, pc] = previewCell;
-//       return pr < rows && pc < cols;
-//     }
-
-//     return false;
-//   };
-
-//   const handlePlaceAt = (r, c) => {
-//     if (!selectedElement) return;
-
-//     if (activeTool === "ground" && selectedElement.type === "groundCover") {
-//       dispatch(
-//         placeElement({
-//           position: [r, c],
-//           element: { ...selectedElement, id: Date.now() },
-//         })
-//       );
-//       return;
-//     }
-
-//     if (activeTool === "mouse" && selectedElement.type !== "groundCover") {
-//       dispatch(
-//         placeElement({
-//           position: [r, c],
-//           element: { ...selectedElement, id: Date.now() },
-//         })
-//       );
-//     }
-//   };
-
-//   return (
-//     <div className="w-full h-full overflow-auto bg-white relative p-2">
-//       <div
-//         className="grid"
-//         style={{
-//           gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
-//           gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-//         }}
-//       >
-//         {Array.from({ length: rows * cols }).map((_, idx) => {
-//           const r = Math.floor(idx / cols);
-//           const c = idx % cols;
-
-//           const occupyingItems = getOccupyingItems(r, c);
-//           const groundCover = occupyingItems.find((it) => it.type === "groundCover");
-//           const nonGroundItems = occupyingItems.filter(
-//             (it) => it.type !== "groundCover"
-//           );
-
-//           let background = "transparent";
-//           if (isPreviewCell(r, c)) {
-//             if (activeTool === "mouse" && selectedElement?.type !== "groundCover") {
-//               background = previewValid()
-//                 ? "rgba(16,185,129,0.35)"
-//                 : "rgba(239,68,68,0.35)";
-//             }
-//             if (activeTool === "ground" && selectedElement?.type === "groundCover") {
-//               background = selectedElement.color
-//                 ? `${selectedElement.color}80`
-//                 : "rgba(107,114,128,0.35)";
-//             }
-//           } else if (nonGroundItems.length > 0) {
-//             background = "#065F46";
-//           } else if (groundCover) {
-//             background = groundCover.color;
-//           }
-
-//           return (
-//             <div
-//               key={idx}
-//               onClick={() => handlePlaceAt(r, c)}
-//               onMouseEnter={() => {
-//                 if (selectedElement) {
-//                   dispatch(setPreviewCell([r, c]));
-//                 }
-//               }}
-//               onMouseLeave={() => {
-//                 dispatch(clearPreviewCell());
-//               }}
-//               className="border border-black flex items-center justify-center text-[10px] relative"
-//               style={{ backgroundColor: background }}
-//             >
-//               {/* Dot in bottom-left corner */}
-//               <span className="absolute bottom-1 left-1 text-black text-[14px]">
-//                 •
-//               </span>
-
-//               {/* Non-ground items */}
-//               {nonGroundItems.length > 0 && (
-//                 <>
-//                   <div className="text-[10px] text-white text-center px-1 truncate">
-//                     {nonGroundItems[nonGroundItems.length - 1].name}
-//                   </div>
-//                   {nonGroundItems.length > 1 && (
-//                     <span className="absolute bottom-1 right-1 text-[9px] bg-white text-black border px-1 rounded shadow-sm">
-//                       +{nonGroundItems.length - 1}
-//                     </span>
-//                   )}
-//                 </>
-//               )}
-//             </div>
-//           );
-//         })}
-//       </div>
-//     </div>
-//   );
-// }
 
 
-// src/components/Grid.jsx
-import  { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { placeElement } from "../redux/gridSlice";
 import { setPreviewCell, clearPreviewCell } from "../redux/uiSlice";
@@ -200,8 +32,7 @@ export default function Grid() {
   const gridRef = useRef(null);
 
   // helper: get cell entry (top-left) if exists
-  const findCellEntry = (r, c) =>
-    elements.find((entry) => entry.position[0] === r && entry.position[1] === c);
+  const findCellEntry = (r, c) => elements.find((entry) => entry.position[0] === r && entry.position[1] === c);
 
   // helper: get all items occupying cell (may be from multi-cell placements)
   const getOccupyingItems = (r, c) => {
@@ -390,22 +221,27 @@ export default function Grid() {
               <span className="absolute bottom-1 left-1 text-black text-[12px]">•</span>
 
               {/* show last placed non-ground item and +N badge */}
-              {nonGroundItems.length > 0 && (
+              {/* {nonGroundItems.length > 0 && (
                 <>
                   <div className="flex items-center justify-center">
-  {iconMap[nonGroundItems[nonGroundItems.length - 1].type] || (
-    <span className="text-[9px] text-white">
-      {nonGroundItems[nonGroundItems.length - 1].name}
-    </span>
-  )}
-</div>
+                    {iconMap[nonGroundItems[nonGroundItems.length - 1].type] || <span className="text-[9px] text-white">{nonGroundItems[nonGroundItems.length - 1].name}</span>}
+                  </div>
 
                   {nonGroundItems.length > 1 && (
-                    <span className="absolute bottom-1 right-1 text-[9px] bg-white text-black border px-1 rounded shadow-sm">
-                      +{nonGroundItems.length - 1}
-                    </span>
+                    <span className="absolute bottom-1 right-1 text-[9px] bg-white text-black border px-1 rounded shadow-sm">+{nonGroundItems.length - 1}</span>
                   )}
                 </>
+              )} */}
+
+              {/* Non-ground items */}
+              {nonGroundItems.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-0.5">
+                  {nonGroundItems.map((item, i) => (
+                    <div key={i} className="flex items-center justify-center">
+                      {iconMap[item.type] || <span className="text-[8px] text-white">{item.name[0]}</span>}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           );

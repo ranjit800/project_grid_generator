@@ -25,11 +25,11 @@ function App() {
         </div>
 
         {/* Playground with its own scroll */}
-  <div className="flex flex-col flex-1 p-2 bg-white rounded-lg shadow relative overflow-hidden">
+  <div className="flex flex-col flex-1 bg-white rounded-lg shadow relative overflow-hidden">
   <EditorNavbar />
  <div
   ref={playgroundRef}
-  className="flex-1 border rounded-lg mt-2 p-2 bg-white relative overflow-auto scrollbar-thin h-full"
+  className="flex-1 border p-2 bg-white relative overflow-auto scrollbar-thin h-full"
 >
   {activeTab === "json" && <JsonEditor />}
   {activeTab === "tile" && (

@@ -75,13 +75,13 @@ export default function Toolbar({ playgroundRef }) {
     dispatch(setZoom(Math.max(0.4, Number((zoom - 0.2).toFixed(2)))));
 
   const tools = [
-    { id: "zoom-in", icon: <ZoomIn size={18} />, action: handleZoomIn },
-    { id: "zoom-out", icon: <ZoomOut size={18} />, action: handleZoomOut },
-    { id: "ground", icon: <Hammer size={18} /> },
-    { id: "dropper", icon: <Droplet size={18} /> },
-    { id: "mouse", icon: <MousePointer size={18} /> },
-    { id: "undo", icon: <Undo size={18} /> },
-    { id: "json", label: "JSON" },
+    { id: "zoom-in", icon: <ZoomIn size={18} />, action: handleZoomIn, title: "Zoom In" },
+    { id: "zoom-out", icon: <ZoomOut size={18} />, action: handleZoomOut, title: "Zoom Out" },
+    { id: "ground", icon: <Hammer size={18} />, title: "Ground Tool" },
+    { id: "dropper", icon: <Droplet size={18} />, title: "Color Dropper" },
+    { id: "mouse", icon: <MousePointer size={18} />, title: "Select / Mouse Tool" },
+    { id: "undo", icon: <Undo size={18} />, title: "Undo Last Action" },
+    { id: "json", label: "JSON", title: "Export JSON" },
   ];
 
   // Dragging logic with boundary constraints
@@ -130,6 +130,7 @@ export default function Toolbar({ playgroundRef }) {
         <button
           onMouseDown={() => setDragging(true)}
           className="cursor-grab active:cursor-grabbing text-gray-500 hover:text-black"
+          title="Move Toolbar"
         >
           <GripHorizontal size={18} />
         </button>
@@ -139,6 +140,7 @@ export default function Toolbar({ playgroundRef }) {
           return (
             <button
               key={tool.id}
+              title={tool.title}
               onClick={() =>
                 tool.action ? tool.action() : dispatch(toggleTool(tool.id))
               }
