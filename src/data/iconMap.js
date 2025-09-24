@@ -1,3 +1,5 @@
+
+// data/iconMap.js
 import { TreePine, Trees, Flower2, Leaf, Sofa, Camera, Apple } from "lucide-react";
 
 // ✅ yaha JSX (<TreePine />) nahi, sirf component reference rakho

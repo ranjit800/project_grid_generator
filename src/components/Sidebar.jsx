@@ -87,59 +87,59 @@
 // export default Sidebar;
 
 
-import { useDispatch, useSelector } from "react-redux";
-import { setSelectedElement } from "../redux/uiSlice";
-import { iconMap } from "../data/iconMap";   // ✅ centralized iconMap
-import { library } from "../data/library";   // ✅ centralized library
+// import { useDispatch, useSelector } from "react-redux";
+// import { setSelectedElement } from "../redux/uiSlice";
+// import { iconMap } from "../data/iconMap";   // ✅ centralized iconMap
+// import { library } from "../data/library";   // ✅ centralized library
 
-function Sidebar() {
-  const dispatch = useDispatch();
-  const selectedElement = useSelector((state) => state.ui.selectedElement);
+// function Sidebar() {
+//   const dispatch = useDispatch();
+//   const selectedElement = useSelector((state) => state.ui.selectedElement);
 
-  return (
-    <div className="w-64 bg-white rounded-lg shadow p-4 overflow-y-auto scrollbar-hide">
-      <h2 className="font-semibold text-gray-700 mb-4 text-sm">Library</h2>
+//   return (
+//     <div className="w-64 bg-white rounded-lg shadow p-4 overflow-y-auto scrollbar-hide">
+//       <h2 className="font-semibold text-gray-700 mb-4 text-sm">Library</h2>
 
-      {Object.keys(library).map((category) => (
-        <div key={category} className="mb-6">
-          {/* Category Title */}
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-gray-600 text-sm">{category}</h3>
-            <span className="text-gray-400 text-sm">→</span>
-          </div>
+//       {Object.keys(library).map((category) => (
+//         <div key={category} className="mb-6">
+//           {/* Category Title */}
+//           <div className="flex justify-between items-center mb-2">
+//             <h3 className="font-semibold text-gray-600 text-sm">{category}</h3>
+//             <span className="text-gray-400 text-sm">→</span>
+//           </div>
 
-          {/* Items */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {library[category].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  console.log("Selected:", item);
-                  dispatch(setSelectedElement(item));
-                }}
-                className={`flex-shrink-0 w-20 h-28 flex flex-col items-center justify-center border rounded-lg bg-white p-2
-                  ${
-                    selectedElement?.id === item.id
-                      ? "border-green-600 ring-1 ring-green-400"
-                      : "hover:bg-green-50"
-                  }`}
-              >
-                {/* ✅ Dynamic icon render */}
-                {(() => {
-                  const Icon = iconMap[item.iconKey]; // get component from map
-                  return Icon ? <Icon size={22} /> : null;
-                })()}
+//           {/* Items */}
+//           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+//             {library[category].map((item) => (
+//               <button
+//                 key={item.id}
+//                 onClick={() => {
+//                   console.log("Selected:", item);
+//                   dispatch(setSelectedElement(item));
+//                 }}
+//                 className={`flex-shrink-0 w-20 h-28 flex flex-col items-center justify-center border rounded-lg bg-white p-2
+//                   ${
+//                     selectedElement?.id === item.id
+//                       ? "border-green-600 ring-1 ring-green-400"
+//                       : "hover:bg-green-50"
+//                   }`}
+//               >
+//                 {/* ✅ Dynamic icon render */}
+//                 {(() => {
+//                   const Icon = iconMap[item.iconKey]; // get component from map
+//                   return Icon ? <Icon size={22} /> : null;
+//                 })()}
 
-                <span className="mt-1 text-xs text-gray-700 text-center leading-tight break-words">
-                  {item.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+//                 <span className="mt-1 text-xs text-gray-700 text-center leading-tight break-words">
+//                   {item.name}
+//                 </span>
+//               </button>
+//             ))}
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
 
-export default Sidebar;
+// export default Sidebar;

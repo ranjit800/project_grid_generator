@@ -33,13 +33,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  activeTab: "tile",      // json | tile | render
+  activeTab: "tile",      
   activeTool: null,       // null means no tool active
   selectedElement: null,
-  previewCell: null,
+  previewCell: null,      // ✅ ab tool se tie nahi hai
   zoom: 1,
 };
-
 const uiSlice = createSlice({
   name: "ui",
   initialState,
@@ -48,16 +47,19 @@ const uiSlice = createSlice({
       state.activeTab = action.payload;
     },
     setActiveTool: (state, action) => {
-      state.activeTool = action.payload;
+      state.activeTool = state.activeTool === action.payload ? null : action.payload;
     },
-    // toggle: if same tool clicked -> deactivate (null), else set new tool
-    toggleTool: (state, action) => {
-      const toolId = action.payload;
-      state.activeTool = state.activeTool === toolId ? null : toolId;
-    },
-    setSelectedElement: (state, action) => {
-      state.selectedElement = action.payload;
-    },
+setSelectedElement: (state, action) => {
+  state.selectedElement = action.payload;
+
+  // ✅ Agar koi element select hua, mouse tool ko OFF kar do
+  if (action.payload) {
+    if (state.activeTool === "mouse") {
+      state.activeTool = null;
+    }
+  }
+},
+
     setPreviewCell: (state, action) => {
       state.previewCell = action.payload;
     },
