@@ -112,13 +112,14 @@ import JsonEditor from "./components/JsonEditor";
 import RenderPlaceholder from "./components/RenderPlaceholder";
 import { useSelector, useDispatch } from "react-redux";
 import Toolbar from "./components/Toolbar";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { initializeGrid, ensureDirtCoverage } from "./redux/gridSlice"; // ✅ ensure coverage on view switch
 
 function App() {
   const activeTab = useSelector((state) => state.ui.activeTab);
   const playgroundRef = useRef(null);
   const dispatch = useDispatch();
+  const [showMiniMap, setShowMiniMap] = useState(true);
 
   // ✅ initialize grid with Dirt cells when app loads
   useEffect(() => {
@@ -147,7 +148,7 @@ function App() {
           {/* 🔹 Left Toolbar */}
           {activeTab === "tile" && (
             <div className="w-14 bg-white rounded-lg shadow flex flex-col items-center py-3">
-              <Toolbar playgroundRef={playgroundRef} />
+              <Toolbar playgroundRef={playgroundRef} onToggleMiniMap={() => setShowMiniMap((v) => !v)} isMiniMapVisible={showMiniMap} />
             </div>
           )}
 
@@ -161,8 +162,8 @@ function App() {
               {activeTab === "render" && <RenderPlaceholder />}
             </div>
 
-            {/* Mini Map anchored to playground container (fixed over scrollable content) */}
-            {activeTab === "tile" && <MiniMap playgroundRef={playgroundRef} width={150} height={150} />}
+            {/* Mini Map (fixed over scrollable content) */}
+            {activeTab === "tile" && showMiniMap && <MiniMap playgroundRef={playgroundRef} width={150} height={150} />}
           </div>
 
           {/* 🔹 Right Sidebar */}

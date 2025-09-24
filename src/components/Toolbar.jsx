@@ -48,7 +48,6 @@
 
 // export default Toolbar;
 
-
 // import React, { useState, useRef, useEffect } from "react";
 // import { useDispatch, useSelector } from "react-redux";
 // import { toggleTool, setZoom } from "../redux/uiSlice";
@@ -164,17 +163,18 @@
 //   );
 // }
 
-
-
-
 // Toolbar.jsx
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveTool, setZoom } from "../redux/uiSlice";
-import { MousePointer, Shovel , ZoomIn, ZoomOut, Undo, Redo } from "lucide-react";
+import { setGridSize } from "../redux/gridSlice";
+import { MousePointer, Shovel, ZoomIn, ZoomOut, Undo, Redo, LocateFixed, Droplet } from "lucide-react";
 
-function Toolbar({ playgroundRef }) {
+function Toolbar({ playgroundRef, onToggleMiniMap, isMiniMapVisible }) {
   const dispatch = useDispatch();
   const { activeTool, zoom } = useSelector((s) => s.ui);
+  const { gridSize } = useSelector((s) => s.grid);
+  const rows = gridSize?.rows ?? 5;
+  const cols = gridSize?.cols ?? 5;
 
   const handleZoom = (dir) => {
     const newZoom = dir === "in" ? zoom + 0.1 : zoom - 0.1;
@@ -183,37 +183,47 @@ function Toolbar({ playgroundRef }) {
 
   const tools = [
     { key: "mouse", icon: <MousePointer size={20} />, label: "Mouse" },
-    { key: "shovel", icon: <Shovel size={20} />, label: "Shovel" }
-
+    { key: "shovel", icon: <Shovel size={20} />, label: "Shovel" },
+    { key: "dropper", icon: <Droplet size={20} />, label: "Dropper" },
+    { key: "json", icon: null, label: "JSON" },
   ];
 
+  const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
+
+  const updateSize = (nextRows, nextCols) => {
+    const r = clamp(parseInt(nextRows, 10) || 0, 1, 100);
+    const c = clamp(parseInt(nextCols, 10) || 0, 1, 100);
+    dispatch(setGridSize({ rows: r, cols: c }));
+  };
+
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <div className="flex flex-col gap-4 items-center h-full">
+      {/* Grid Size Controls */}
+      <div className="flex flex-col items-center gap-2 w-full px-1">
+        <div className="flex flex-col items-center gap-1 w-full">
+          <span className="text-[10px] text-gray-600">Rows</span>
+          <input type="number" min={1} max={100} value={rows} onChange={(e) => updateSize(e.target.value, cols)} className="w-12 text-center border rounded px-1 py-0.5 text-xs" />
+        </div>
+        <div className="flex flex-col items-center gap-1 w-full">
+          <span className="text-[10px] text-gray-600">Cols</span>
+          <input type="number" min={1} max={100} value={cols} onChange={(e) => updateSize(rows, e.target.value)} className="w-12 text-center border rounded px-1 py-0.5 text-xs" />
+        </div>
+      </div>
       {tools.map((tool) => (
         <button
           key={tool.key}
           onClick={() => dispatch(setActiveTool(tool.key))}
-          className={`p-2 rounded-lg ${
-            activeTool === tool.key
-              ? "bg-green-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={`p-2 rounded-lg ${activeTool === tool.key ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
         >
-          {tool.icon}
+          {tool.icon ? tool.icon : <span className="text-[10px] font-semibold">JSON</span>}
         </button>
       ))}
 
       {/* Zoom Controls */}
-      <button
-        onClick={() => handleZoom("in")}
-        className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-      >
+      <button onClick={() => handleZoom("in")} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
         <ZoomIn size={20} />
       </button>
-      <button
-        onClick={() => handleZoom("out")}
-        className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-      >
+      <button onClick={() => handleZoom("out")} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
         <ZoomOut size={20} />
       </button>
 
@@ -223,6 +233,18 @@ function Toolbar({ playgroundRef }) {
       </button>
       <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
         <Redo size={20} />
+      </button>
+
+      {/* Spacer pushes toggle to bottom */}
+      <div className="flex-1" />
+
+      {/* Mini Map Toggle at bottom of toolbar */}
+      <button
+        onClick={() => onToggleMiniMap && onToggleMiniMap()}
+        className={`p-2 mb-2 rounded-md ${isMiniMapVisible ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+        title={isMiniMapVisible ? "Hide Minimap" : "Show Minimap"}
+      >
+        <LocateFixed size={18} />
       </button>
     </div>
   );

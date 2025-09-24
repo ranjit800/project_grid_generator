@@ -1,19 +1,29 @@
 function WebsiteNavbar() {
   return (
-    <div className="w-full border-b sticky top-0 z-10 bg-white px-4">
+    <div className="w-full border-b sticky top-0 z-10 bg-white">
       {/* Top Bar */}
-      <div className="flex justify-between items-center px-6 py-2 bg-white">
-        <h1 className="text-lg font-bold">EDEN</h1>
-        <div className="space-x-3">
-          <button className="bg-green-600 text-white px-3 py-1 rounded text-sm">Save</button>
-          <button className="bg-gray-200 px-3 py-1 rounded text-sm">Render All</button>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center px-[5vw] py-2 bg-white gap-2">
+        
+        {/* Brand */}
+        <h1 className="text-lg md:text-xl font-bold">EDEN</h1>
+
+        {/* Address / Info Bar */}
+        <div className="text-gray-500 text-sm md:text-base text-center md:text-left">
+          55 Dimond — Design v66
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-center md:justify-end gap-2">
+          <button className="bg-green-600 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-green-700 transition">
+            Save
+          </button>
+          <button className="bg-gray-200 px-4 py-2 rounded text-sm md:text-base hover:bg-gray-300 transition">
+            Render All
+          </button>
         </div>
       </div>
-      {/* Address / Info Bar */}
-      <div className="px-6 py-1 text-gray-500 text-sm">
-        55 Dimond — Design v66
-      </div>
     </div>
-  )
+  );
 }
-export default WebsiteNavbar
+
+export default WebsiteNavbar;
