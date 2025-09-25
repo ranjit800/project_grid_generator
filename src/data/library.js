@@ -24,12 +24,7 @@ export const library = {
   Plants: [
     // Replaced by mapped API demo data below
   ],
-  Fruits: [
-    { id: "f1", type: "fruit", name: "Apple", iconKey: "fruit", size: [1, 1], description: "A common fruit from the apple tree, typically round and with red or green skin." },
-    { id: "f2", type: "fruit", name: "Orange", iconKey: "fruit", size: [1, 1], description: "A citrus fruit known for its bright color and high vitamin C content." },
-    { id: "f3", type: "fruit", name: "Banana Plant", iconKey: "fruit", size: [2, 2], description: "A large herbaceous plant that produces the curved, yellow fruit." },
-    { id: "f4", type: "fruit", name: "Mango", iconKey: "fruit", size: [1, 1], description: "A sweet, tropical stone fruit with a rich, creamy texture." },
-  ],
+
   "Ground Covers": [
     { id: "g1", type: "groundCover", name: "Dirt", iconKey: "groundCover", size: [1, 1], color: "#8B4513", description: "A loose mixture of earth, organic matter, and minerals." },
     { id: "g2", type: "groundCover", name: "Grass", iconKey: "groundCover", size: [1, 1], color: "#6EE7B7", description: "A common ground cover forming a green lawn or pasture." },
@@ -999,3 +994,77 @@ function mapApiPlantToLibraryItem(item) {
 
 // Inject mapped demo plants into library
 library.Plants = catalogPlantsDemo.map(mapApiPlantToLibraryItem);
+
+// --- Backend catalog lookups for non-plant items used in export/import ---
+// Minimal entries to allow correct ID/type mapping and catalog_items population
+export const backendGroundCoversById = {
+  1: {
+    id: 1,
+    name: "(o) Lush Green Grass",
+    material_type: "grass",
+    asset_location: "s3://plant-3d-assets/test/ground/patchy_grass 1x1 ft.blend",
+    created_at: "2025-08-18T04:28:35.469547Z",
+    updated_at: "2025-09-16T19:37:51.588620Z",
+  },
+  14: {
+    id: 14,
+    name: "1 Gravel Tan 2",
+    material_type: "sand",
+    asset_location: "s3://plant-3d-assets/test/ground/gravel/Gravel TAN v2.blend",
+    created_at: "2025-09-16T15:50:45.190720Z",
+    updated_at: "2025-09-19T19:42:41.110004Z",
+  },
+  2: {
+    id: 2,
+    name: "(o) Grey Pebble Gravel",
+    material_type: "gravel",
+    asset_location: "s3://plant-3d-assets/test/ground/gravel_floor_02_2k 1x1 ft.blend",
+    created_at: "2025-08-18T04:28:35.478138Z",
+    updated_at: "2025-09-16T19:39:59.468437Z",
+  },
+};
+
+export const backendFurnitureById = {
+  2: {
+    id: 2,
+    name: "Adiroandack chair",
+    furniture_type: "chair",
+    dimensions: { width: 2, height: 2.5, length: 2 },
+    asset_location: "s3://plant-3d-assets/test/furniture/Adiroandack+chair.blend",
+    description: "",
+    created_at: "2025-08-18T08:50:02.312222Z",
+    updated_at: "2025-08-18T08:50:02.312240Z",
+  },
+  8: {
+    id: 8,
+    name: "Flower Pot",
+    furniture_type: "planter",
+    dimensions: { width: 2, height: 1, length: 1 },
+    asset_location: "s3://plant-3d-assets/test/furniture/FlowerPot_Pack.blend",
+    description: "",
+    created_at: "2025-09-16T20:28:12.323078Z",
+    updated_at: "2025-09-16T20:28:12.323094Z",
+  },
+};
+
+// Attach backend IDs to local library items when we can match by name
+// Ground Covers
+library["Ground Covers"] = library["Ground Covers"].map((gc) => {
+  const nameToId = {
+    "(o) Lush Green Grass": 1,
+    "1 Gravel Tan 2": 14,
+    "(o) Grey Pebble Gravel": 2,
+  };
+  const backendId = nameToId[gc.name] || gc.backendId;
+  return { ...gc, backendId };
+});
+
+// Furniture
+library.Furniture = library.Furniture.map((fu) => {
+  const nameToId = {
+    "Adiroandack chair": 2,
+    "Flower Pot": 8,
+  };
+  const backendId = nameToId[fu.name] || fu.backendId;
+  return { ...fu, backendId };
+});

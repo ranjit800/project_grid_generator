@@ -9,7 +9,7 @@ function WebsiteNavbar() {
 
         {/* Address / Info Bar */}
         <div className="text-gray-500 text-sm md:text-base text-center md:text-left">
-          55 Dimond — Design v66
+          55 Dimond — Design v69
         </div>
 
         {/* Buttons */}

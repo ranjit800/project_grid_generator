@@ -167,7 +167,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveTool, setZoom } from "../redux/uiSlice";
 import { setGridSize } from "../redux/gridSlice";
-import { MousePointer, Shovel, ZoomIn, ZoomOut, Undo, Redo, LocateFixed, Droplet } from "lucide-react";
+import { MousePointer, Shovel, ZoomIn, ZoomOut, Undo, Redo, LocateFixed, Pipette } from "lucide-react";
 
 function Toolbar({ playgroundRef, onToggleMiniMap, isMiniMapVisible }) {
   const dispatch = useDispatch();
@@ -184,7 +184,7 @@ function Toolbar({ playgroundRef, onToggleMiniMap, isMiniMapVisible }) {
   const tools = [
     { key: "mouse", icon: <MousePointer size={20} />, label: "Mouse" },
     { key: "shovel", icon: <Shovel size={20} />, label: "Shovel" },
-    { key: "dropper", icon: <Droplet size={20} />, label: "Dropper" },
+    { key: "dropper", icon: <Pipette size={20} />, label: "Dropper" },
     { key: "json", icon: null, label: "JSON" },
   ];
 
@@ -195,6 +195,16 @@ function Toolbar({ playgroundRef, onToggleMiniMap, isMiniMapVisible }) {
     const c = clamp(parseInt(nextCols, 10) || 0, 1, 100);
     dispatch(setGridSize({ rows: r, cols: c }));
   };
+
+  // Tooltip component for hover
+  const ToolTip = ({ children, text }) => (
+    <div className="relative group">
+      {children}
+      <span className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap bg-black text-white text-xs rounded px-2 py-1 shadow-lg">
+        {text}
+      </span>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-4 items-center h-full">
@@ -210,42 +220,55 @@ function Toolbar({ playgroundRef, onToggleMiniMap, isMiniMapVisible }) {
         </div>
       </div>
       {tools.map((tool) => (
-        <button
-          key={tool.key}
-          onClick={() => dispatch(setActiveTool(tool.key))}
-          className={`p-2 rounded-lg ${activeTool === tool.key ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-        >
-          {tool.icon ? tool.icon : <span className="text-[10px] font-semibold">JSON</span>}
-        </button>
+        <ToolTip key={tool.key} text={tool.label}>
+          <button
+            onClick={() => dispatch(setActiveTool(tool.key))}
+            className={`p-2 rounded-lg ${activeTool === tool.key ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+            aria-label={tool.label}
+            type="button"
+          >
+            {tool.icon ? tool.icon : <span className="text-[10px] font-semibold">JSON</span>}
+          </button>
+        </ToolTip>
       ))}
 
       {/* Zoom Controls */}
-      <button onClick={() => handleZoom("in")} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-        <ZoomIn size={20} />
-      </button>
-      <button onClick={() => handleZoom("out")} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-        <ZoomOut size={20} />
-      </button>
+      <ToolTip text="Zoom In">
+        <button onClick={() => handleZoom("in")} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200" aria-label="Zoom In" type="button">
+          <ZoomIn size={20} />
+        </button>
+      </ToolTip>
+      <ToolTip text="Zoom Out">
+        <button onClick={() => handleZoom("out")} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200" aria-label="Zoom Out" type="button">
+          <ZoomOut size={20} />
+        </button>
+      </ToolTip>
 
       {/* Optional undo/redo */}
-      <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-        <Undo size={20} />
-      </button>
-      <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-        <Redo size={20} />
-      </button>
+      <ToolTip text="Undo">
+        <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200" aria-label="Undo" type="button">
+          <Undo size={20} />
+        </button>
+      </ToolTip>
+      <ToolTip text="Redo">
+        <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200" aria-label="Redo" type="button">
+          <Redo size={20} />
+        </button>
+      </ToolTip>
 
       {/* Spacer pushes toggle to bottom */}
       <div className="flex-1" />
 
       {/* Mini Map Toggle at bottom of toolbar */}
-      <button
-        onClick={() => onToggleMiniMap && onToggleMiniMap()}
-        className={`p-2 mb-2 rounded-md ${isMiniMapVisible ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-        title={isMiniMapVisible ? "Hide Minimap" : "Show Minimap"}
-      >
-        <LocateFixed size={18} />
-      </button>
+      <ToolTip text={isMiniMapVisible ? "Hide Minimap" : "Show Minimap"}>
+        <button
+          onClick={() => onToggleMiniMap && onToggleMiniMap()}
+          className={`p-2 mb-2 rounded-md ${isMiniMapVisible ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+          type="button"
+        >
+          <LocateFixed size={18} />
+        </button>
+      </ToolTip>
     </div>
   );
 }

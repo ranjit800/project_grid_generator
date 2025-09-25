@@ -166,6 +166,7 @@
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Info, X } from "lucide-react";
 import { iconMap } from "../data/iconMap";
 import { library } from "../data/library";
 import { setSelectedElement, setActiveTool } from "../redux/uiSlice";
@@ -190,10 +191,10 @@ function RightSidebar() {
             setPreviewItem(item);
           }}
           title="Info"
-          className="absolute -top-1 -right-1 z-10 w-5 h-5 rounded-full bg-white border text-gray-700 text-xs flex items-center justify-center hover:bg-gray-50"
+          className="absolute top-1 right-1 z-10 w-5 h-5 rounded-full bg-white border text-gray-700 text-xs flex items-center justify-center hover:bg-gray-50"
           aria-label={`Show info for ${item.name}`}
         >
-          i
+          <Info size={16} />
         </button>
 
         <button
@@ -297,11 +298,11 @@ function RightSidebar() {
             <h3 className="font-semibold text-gray-700 text-sm truncate">{previewItem.name}</h3>
             <button
               onClick={() => setPreviewItem(null)}
-              className="w-6 h-6 rounded-full bg-white border text-gray-700 flex items-center justify-center hover:bg-gray-50"
+              className="w-6 h-6 rounded-full bg-white border text-gray-900 flex items-center justify-center hover:bg-gray-50"
               aria-label="Close preview"
               title="Close"
             >
-              ×
+              <X size={16} />
             </button>
           </div>
           <div className="p-2 overflow-auto flex-1">
