@@ -665,8 +665,8 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { placeElement, updateGroundCover } from "../redux/gridSlice";
-import { setPreviewCell, clearPreviewCell } from "../redux/uiSlice";
+import { placeElement, updateGroundCover, resetCellToDirt, shovelAtCell } from "../redux/gridSlice";
+import { setPreviewCell, clearPreviewCell, setSelectedElement, setActiveTool } from "../redux/uiSlice";
 import { iconMap } from "../data/iconMap";
 import { toast } from "react-toastify";
 
@@ -680,7 +680,7 @@ export default function Grid() {
   const baseCellSize = 50;
   const cellSize = baseCellSize * (zoom || 1);
 
-  const [cellPopup, setCellPopup] = useState({ open: false, x: 0, y: 0, cell: null, items: [] });
+  const [cellPopup, setCellPopup] = useState({ open: false, x: 0, y: 0, cell: null, items: [], mode: "info" });
   const gridRef = useRef(null);
 
   // Build a fast cell occupancy map to avoid O(N*M) scans per cell
@@ -735,7 +735,7 @@ export default function Grid() {
 
   const isPreviewCell = (r, c) => {
     if (!previewCell || !selectedElement) return false;
-    if (activeTool === "mouse" || activeTool === "shovel") return false;
+    if (activeTool !== "add") return false;
     const [pr, pc] = previewCell;
     const [h = 1, w = 1] = selectedElement.size || [1, 1];
     return r >= pr && r < pr + h && c >= pc && c < pc + w;
@@ -749,7 +749,7 @@ export default function Grid() {
     return true;
   };
 
-  const openCellPopup = (r, c) => {
+  const openCellPopup = (r, c, mode = "info") => {
     if (!gridRef.current) return;
     const gridRect = gridRef.current.getBoundingClientRect();
     setCellPopup({
@@ -758,6 +758,7 @@ export default function Grid() {
       y: gridRect.top + r * cellSize + 8,
       cell: [r, c],
       items: getOccupyingItems(r, c),
+      mode,
     });
   };
 
@@ -809,27 +810,22 @@ export default function Grid() {
     // ✅ Shovel Tool Logic
     // --- SHOVEL TOOL ---
     if (activeTool === "shovel") {
-      const currentGround = findGroundCover(r, c);
-      console.log("🔨 Shovel clicked", { currentGround });
+      dispatch(shovelAtCell({ position: [r, c] }));
+      toast.success(`Cleared items covering [${r},${c}] and reset ground`);
+      return;
+    }
 
-      if (!currentGround) {
-        console.log("❌ No ground cover found, nothing to revert.");
-        return;
+    // --- DROPPER TOOL ---
+    if (activeTool === "dropper") {
+      const items = getOccupyingItems(r, c);
+      if (!items.length) return;
+      if (items.length === 1) {
+        dispatch(setSelectedElement(items[0]));
+        dispatch(setActiveTool("add"));
+        toast.success(`Selected ${items[0].name || items[0].type}`);
+      } else {
+        openCellPopup(r, c, "dropper");
       }
-
-      if (currentGround.name === "Dirt") {
-        console.log("✅ Already Dirt, shovel does nothing.");
-        toast.info(`Cell [${r},${c}] is already Dirt`);
-        return;
-      }
-
-      const dirt = makeDirt();
-      console.log("🔄 Replacing", currentGround.name, "→ Dirt");
-
-      dispatch(updateGroundCover({ position: [r, c], ground: dirt }));
-
-      // ✅ Toast on reset
-      toast.success(`Ground at cell [${r},${c}] reset to Dirt (was ${currentGround.name})`);
       return;
     }
 
@@ -841,8 +837,13 @@ export default function Grid() {
       return;
     }
 
-    // --- PLACE ELEMENT ---
+    // --- PLACE ELEMENT (only when Add tool is active) ---
     if (selectedElement) {
+      if (activeTool !== "add") {
+        toast.warn("Activate Add (+) to place elements");
+        return;
+      }
+
       if (selectedElement.type === "groundCover") {
         console.log("🌱 Placing groundCover:", selectedElement.name);
         dispatch(
@@ -867,7 +868,7 @@ export default function Grid() {
   };
 
   const handleMouseEnter = (r, c) => {
-    if (selectedElement && activeTool !== "mouse" && activeTool !== "shovel") {
+    if (selectedElement && activeTool === "add") {
       dispatch(setPreviewCell([r, c]));
     }
   };
@@ -936,14 +937,33 @@ export default function Grid() {
       {cellPopup.open && (
         <div id="grid-cell-popup" style={{ position: "fixed", left: cellPopup.x, top: cellPopup.y, zIndex: 60 }} className="bg-white border rounded-md shadow-lg p-3 text-sm w-48">
           <div className="font-semibold mb-2">Cell: {cellPopup.cell?.join(", ")}</div>
-          <div className="space-y-1 max-h-48 overflow-auto">
-            {cellPopup.items.map((it, i) => (
-              <div key={i} className="flex justify-between items-center">
-                <div className="text-gray-700 truncate">{it.name}</div>
-                <div className="text-xs text-gray-500">{it.type}</div>
-              </div>
-            ))}
-          </div>
+          {cellPopup.mode === "dropper" ? (
+            <div className="space-y-1 max-h-48 overflow-auto">
+              {cellPopup.items.map((it, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    dispatch(setSelectedElement(it));
+                    dispatch(setActiveTool("add"));
+                    setCellPopup({ open: false, x: 0, y: 0, cell: null, items: [], mode: "info" });
+                  }}
+                  className="w-full flex justify-between items-center text-left px-2 py-1 rounded hover:bg-gray-50 border"
+                >
+                  <span className="text-gray-800 truncate text-xs">{it.name}</span>
+                  <span className="text-[10px] text-gray-500">{it.type}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-1 max-h-48 overflow-auto">
+              {cellPopup.items.map((it, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div className="text-gray-700 truncate">{it.name}</div>
+                  <div className="text-xs text-gray-500">{it.type}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

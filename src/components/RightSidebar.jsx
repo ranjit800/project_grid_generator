@@ -164,7 +164,7 @@
 
 // export default RightSidebar;
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Info, X } from "lucide-react";
 import { iconMap } from "../data/iconMap";
@@ -174,11 +174,19 @@ import { setSelectedElement, setActiveTool } from "../redux/uiSlice";
 function RightSidebar() {
   const dispatch = useDispatch();
   const selectedElement = useSelector((state) => state.ui.selectedElement);
+  const activeTool = useSelector((state) => state.ui.activeTool);
 
   const [collapsed, setCollapsed] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeTab, setActiveTab] = useState("title"); // "title" | "desc"
   const [previewItem, setPreviewItem] = useState(null); // image preview state
+
+  // Auto-expand sidebar when Add tool is activated
+  useEffect(() => {
+    if (activeTool === "add") {
+      setCollapsed(false);
+    }
+  }, [activeTool]);
 
   const renderItemCard = (item) => {
     const Icon = iconMap[item.iconKey];
@@ -199,7 +207,10 @@ function RightSidebar() {
 
         <button
           onClick={() => {
-            dispatch(setActiveTool(null)); // ✅ clear tool before selecting
+            // Keep Add tool active when selecting an element; clear others
+            if (activeTool !== "add") {
+              dispatch(setActiveTool(null));
+            }
             dispatch(setSelectedElement(item));
           }}
           className={`flex-shrink-0 w-20 h-28 flex flex-col items-center justify-center border rounded-lg bg-white p-2
