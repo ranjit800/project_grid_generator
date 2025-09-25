@@ -459,9 +459,52 @@ const gridSlice = createSlice({
       const { rows, cols } = state.gridSize;
       state.elements = normalizeElementsToGrid(state.elements || [], rows, cols);
     },
+    // Remove any non-ground items that occupy the clicked cell, and reset that cell's ground to Dirt
+    shovelAtCell: (state, action) => {
+      const { position } = action.payload || {};
+      if (!position) return;
+      const [r, c] = position;
+
+      // Remove non-ground items whose footprint covers (r,c)
+      for (const entry of state.elements) {
+        const [pr, pc] = entry.position || [];
+        const filtered = [];
+        for (const it of entry.items || []) {
+          const [h = 1, w = 1] = it.size || [1, 1];
+          const occupies = r >= pr && r < pr + h && c >= pc && c < pc + w;
+          if (it.type === "groundCover" || !occupies) {
+            filtered.push(it);
+          }
+        }
+        entry.items = filtered;
+      }
+
+      // Reset ground at (r,c) to Dirt (preserve any remaining non-ground at that exact cell entry)
+      const existing = state.elements.find((el) => el.position[0] === r && el.position[1] === c);
+      const dirt = makeDirtForCell(r, c);
+      if (existing) {
+        const nonGround = (existing.items || []).filter((it) => it.type !== "groundCover");
+        existing.items = [dirt, ...nonGround];
+      } else {
+        state.elements.push({ position: [r, c], items: [dirt] });
+      }
+    },
+    // reset a cell to only Dirt (remove all non-ground items too)
+    resetCellToDirt: (state, action) => {
+      const { position } = action.payload || {};
+      if (!position) return;
+      const [r, c] = position;
+      const existing = state.elements.find((el) => el.position[0] === r && el.position[1] === c);
+      const dirt = makeDirtForCell(r, c);
+      if (existing) {
+        existing.items = [dirt];
+      } else {
+        state.elements.push({ position: [r, c], items: [dirt] });
+      }
+    },
   },
 });
 
-export const { initializeGrid, placeElement, updateGroundCover, setGridSize, setElements, applyBackend, ensureDirtCoverage } = gridSlice.actions;
+export const { initializeGrid, placeElement, updateGroundCover, setGridSize, setElements, applyBackend, ensureDirtCoverage, shovelAtCell, resetCellToDirt } = gridSlice.actions;
 
 export default gridSlice.reducer;
